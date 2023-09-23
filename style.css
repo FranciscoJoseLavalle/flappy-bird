@@ -1,0 +1,11 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    text-align: center;
+    user-select: none;
+}
+
+#board {
+    background-image: url(/img/flappybirdbg.png);
+}
