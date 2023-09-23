@@ -25,14 +25,19 @@ let pipeY = 0;
 let topPipeImg;
 let bottomPipeImg;
 
-let velocityX = -2.5;
+let velocityX = -2;
 let velocityY = 0;
 let gravity = 0.3;
 
 let gameOver = false;
 let score = 0;
 let record = localStorage.getItem('score') || 0;
-let fps = 60;
+let fps = 240;
+let fpsInterval;
+let now;
+let then;
+let startTime;
+let elapsed;
 
 window.onload = () => {
     board = document.getElementById("board");
@@ -53,59 +58,73 @@ window.onload = () => {
     bottomPipeImg.src = "./img/bottompipe.png"
 
     // requestAnimationFrame(update);
-    setInterval(() => {
-        update();
-    }, 1000 / fps)
+    fpsInterval = 1000 / fps
+    then = Date.now();
+    startTime = then;
+    update();
+    // setInterval(() => {
+    //     update();
+    // }, 1000 / fps)
     setInterval(placePipes, 1500);
     document.addEventListener('keydown', moveBird);
     document.addEventListener('click', moveBirdWithClick);
 }
 
 function update() {
-    // requestAnimationFrame(update);
-    if (gameOver) {
-        return;
-    }
-    context.clearRect(0, 0, board.width, board.height);
 
-    velocityY += gravity;
-    bird.y = Math.max(bird.y + velocityY, 0);
-    context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+    requestAnimationFrame(update);
+    now = Date.now();
+    elapsed = now - then;
 
-    if (bird.y > board.height) {
-        gameOver = true;
-    }
+    if (elapsed > fpsInterval) {
+        then = now - (elapsed % fpsInterval)
 
-    pipeArray.forEach((pipe) => {
-        pipe.x += velocityX;
-        context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
 
-        if (!pipe.passed && bird.x > pipe.x + pipe.width) {
-            score += 0.5;
-            pipe.passed = true;
+        if (gameOver) {
+            return;
         }
+        context.clearRect(0, 0, board.width, board.height);
 
-        if (detectCollision(bird, pipe)) {
+        velocityY += gravity;
+        bird.y = Math.max(bird.y + velocityY, 0);
+        console.log(bird.y);
+        context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+
+        if (bird.y > board.height) {
             gameOver = true;
         }
-    })
 
-    while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth) {
-        pipeArray.shift();
-    }
+        pipeArray.forEach((pipe) => {
+            pipe.x += velocityX;
+            context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
 
-    context.fillStyle = "white";
-    context.font = "45px sans-serif";
-    context.fillText(`Record: ${record}`, 5, 45);
-    context.fillText(score, 5, 90);
+            if (!pipe.passed && bird.x > pipe.x + pipe.width) {
+                score += 0.5;
+                pipe.passed = true;
+            }
 
-    if (gameOver) {
-        if (localStorage.getItem('score') <= score) {
-            localStorage.setItem('score', score);
-            record = localStorage.getItem('score')
-            context.fillText("New record!", 68, boardHeight / 2 + 50)
+            if (detectCollision(bird, pipe)) {
+                gameOver = true;
+            }
+        })
+
+        while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth) {
+            pipeArray.shift();
         }
-        context.fillText("Game over", 68, boardHeight / 2)
+
+        context.fillStyle = "white";
+        context.font = "45px sans-serif";
+        context.fillText(`Record: ${record}`, 5, 45);
+        context.fillText(score, 5, 90);
+
+        if (gameOver) {
+            if (localStorage.getItem('score') <= score) {
+                localStorage.setItem('score', score);
+                record = localStorage.getItem('score')
+                context.fillText("New record!", 68, boardHeight / 2 + 50)
+            }
+            context.fillText("Game over", 68, boardHeight / 2)
+        }
     }
 }
 
