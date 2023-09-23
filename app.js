@@ -98,6 +98,7 @@ function update() {
     if (gameOver) {
         if (localStorage.getItem('score') <= score) {
             localStorage.setItem('score', score);
+            record = localStorage.getItem('score')
             context.fillText("New record!", 68, boardHeight / 2 + 50)
         }
         context.fillText("Game over", 68, boardHeight / 2)
