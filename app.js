@@ -25,13 +25,14 @@ let pipeY = 0;
 let topPipeImg;
 let bottomPipeImg;
 
-let velocityX = -2;
+let velocityX = -2.5;
 let velocityY = 0;
-let gravity = 0.25;
+let gravity = 0.3;
 
 let gameOver = false;
 let score = 0;
 let record = localStorage.getItem('score') || 0;
+let fps = 60;
 
 window.onload = () => {
     board = document.getElementById("board");
@@ -51,14 +52,17 @@ window.onload = () => {
     bottomPipeImg = new Image();
     bottomPipeImg.src = "./img/bottompipe.png"
 
-    requestAnimationFrame(update);
+    // requestAnimationFrame(update);
+    setInterval(() => {
+        update();
+    }, 1000 / fps)
     setInterval(placePipes, 1500);
     document.addEventListener('keydown', moveBird);
     document.addEventListener('click', moveBirdWithClick);
 }
 
 function update() {
-    requestAnimationFrame(update);
+    // requestAnimationFrame(update);
     if (gameOver) {
         return;
     }
